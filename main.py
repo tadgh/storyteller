@@ -43,34 +43,44 @@ async def wake_up():
     await send_all_to_town_square()
 
 async def send_to_random_night_channels(members):
-    channels = []
-    for channel in guild.channels:
-        if channel.category and channel.category.name == "Night Phase":
-            channels.append(channel)
-
+    channels = get_night_phase_channels()
     random.shuffle(channels)
-
     for member in members:
         await member.move_to(channels.pop())
 
-async def send_all_to_town_square():
+
+def extract_non_bots_from_night_channels(night_channels):
     night_members = []
-    for channel in guild.channels:
-        if channel.category and channel.category.name == "Night Phase":
-            for member_id, _ in channel.voice_states.items():
-                member = guild.get_member(member_id)
-                if not member.bot:
-                    night_members.append(member)
-    town_square = discord.utils.get(guild.voice_channels, name="Town Square", bitrate=64000)
+    for channel in night_channels:
+        for member_id, _ in channel.voice_states.items():
+            member = guild.get_member(member_id)
+            if not member.bot:
+                night_members.append(member)
+    return night_members
+
+
+async def send_all_to_town_square():
+    night_channels = get_night_phase_channels()
+    night_members = extract_non_bots_from_night_channels(night_channels)
+    town_square = get_town_square()
     for member in night_members:
         await member.move_to(town_square)
 
 async def go_to_sleep():
-    channel = discord.utils.get(guild.voice_channels, name="Town Square", bitrate=64000)
+    channel = get_town_square()
     voice_states = channel.voice_states
-
     members = [guild.get_member(member_id) for member_id, _ in voice_states.items()]
     await send_to_random_night_channels(members)
+
+
+def get_town_square():
+    channel = discord.utils.get(guild.voice_channels, name="Town Square", bitrate=64000)
+    return channel
+
+def get_night_phase_channels():
+    category = discord.utils.find(lambda m: m.name == "Night Phase", guild.categories)
+    return category.channels
+
 
 currentDayAndNight = 1
 async def notify_day_count():
