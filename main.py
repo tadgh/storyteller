@@ -26,6 +26,7 @@ client = discord.Client(intents=intents)
 guild = None
 
 currentDayAndNight = 1
+clockhand = False
 
 @client.event
 async def on_ready():
@@ -76,6 +77,12 @@ async def go_to_sleep():
     voice_states = channel.voice_states
     members = [guild.get_member(member_id) for member_id, _ in voice_states.items()]
     await send_to_random_night_channels(members)
+    if clockhand:
+        moveer_channel = discord.utils.get(guild.channels, name='moveeradmin')
+        if currentDayAndNight == 1:
+            await moveer_channel.send(f'The clockhand is on the demon')
+        else:
+            await moveer_channel.send(f'The clockhand has moved {currentDayAndNight - 1} times')
 
 
 def get_town_square():
@@ -128,6 +135,12 @@ async def send_help():
     await moveer_channel.send(help_message)
 
 
+async def toggle_clockhand():
+    global clockhand
+    moveer_channel = discord.utils.get(guild.channels, name='moveeradmin')
+    clockhand = not clockhand
+    await moveer_channel.send(f'The clockhand is now {"on" if clockhand else "off"}')
+
 
 @client.event
 async def on_message(message):
@@ -149,6 +162,8 @@ async def on_message(message):
             await notify_whispers_end()
         elif "help" in message.content.lower():
             await send_help()
+        elif "clockhand" in message.content.lower():
+            await toggle_clockhand()
 
 
 client.run(TOKEN)
