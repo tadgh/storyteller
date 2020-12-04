@@ -25,6 +25,7 @@ intents.members = True
 client = discord.Client(intents=intents)
 guild = None
 
+currentDayAndNight = 1
 
 @client.event
 async def on_ready():
@@ -87,9 +88,6 @@ def get_night_phase_channels():
     return category.channels
 
 
-currentDayAndNight = 1
-
-
 async def notify_day_count():
     global currentDayAndNight
     update_channel = discord.utils.get(guild.channels, name='game-chat')
@@ -117,6 +115,20 @@ async def notify_whispers_end():
     for channel in channels: await channel.send(f"Whispers are now closed. Please return to {TOWN_SQUARE} for nominations.")
 
 
+async def send_help():
+    help_message = (
+        'The following commands are available for use:\n\n' 
+        f'- **go to sleep**: Send all users in {TOWN_SQUARE} to channels within the {NIGHT_CATEGORY} category\n'
+        f'- **wake up**: Send all non-bot users from {NIGHT_CATEGORY} channels back to {TOWN_SQUARE}. Increments day/night count.\n'
+        '- **wake up gently**: Same as "wake up", but does not increment day/night count. For use if the storyteller makes a mistake and needs to send everyone back to bed. \n'
+        '- **game over**: Resets day/night count and clears the game-chat logs\n'
+        '- **whisper**: Sends warnings in general and game-chat to end private conversations\n'
+    )
+    moveer_channel = discord.utils.get(guild.channels, name='moveeradmin')
+    await moveer_channel.send(help_message)
+
+
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -135,6 +147,8 @@ async def on_message(message):
             await clear_game_chat()
         elif "whisper" in message.content.lower():
             await notify_whispers_end()
+        elif "help" in message.content.lower():
+            await send_help()
 
 
 client.run(TOKEN)
