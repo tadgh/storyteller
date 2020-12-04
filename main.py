@@ -8,6 +8,7 @@ from time import sleep
 
 # bot.py
 import os
+import asyncio
 
 import discord
 from dotenv import load_dotenv
@@ -93,6 +94,15 @@ def reset_count():
     currentDayAndNight = 1
 
 
+async def notify_whispers_end():
+    update_channel = discord.utils.get(guild.channels, name=TOWN_SQUARE)
+    await update_channel.send(f"Whispers closing in 1 minute.")
+    await asyncio.sleep(30)
+    await update_channel.send(f"Whispers closing in 30 seconds. Please wrap up your conversations.")
+    await asyncio.sleep(30)
+    await update_channel.send(f"Whispers are now closed. Please return to {TOWN_SQUARE} for nominations.")
+
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -106,6 +116,8 @@ async def on_message(message):
             await notify_day_count()
         elif "game over" in message.content.lower():
             reset_count()
+        elif "whispers" in message.content.lower():
+            await notify_whispers_end()
 
 client.run(TOKEN)
 
