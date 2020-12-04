@@ -8,6 +8,7 @@ from time import sleep
 
 # bot.py
 import os
+import asyncio
 
 import discord
 from dotenv import load_dotenv
@@ -24,11 +25,13 @@ intents.members = True
 client = discord.Client(intents=intents)
 guild = None
 
+
 @client.event
 async def on_ready():
     global guild
     print(f'{client.user} has connected to Discord in guild {client.guilds}')
     guild = discord.utils.get(client.guilds, name=GUILD)
+
 
 @client.event
 async def on_member_join(member):
@@ -37,8 +40,10 @@ async def on_member_join(member):
         f"Hi {member.name}, welcome to Blood on the Clocktower! Here is the link to join the session https://bra1n.github.io/townsquare/#play/max"
     )
 
+
 async def wake_up():
     await send_all_to_town_square()
+
 
 async def send_to_random_night_channels(members):
     channels = get_night_phase_channels()
@@ -64,6 +69,7 @@ async def send_all_to_town_square():
     for member in night_members:
         await member.move_to(town_square)
 
+
 async def go_to_sleep():
     channel = get_town_square()
     voice_states = channel.voice_states
@@ -75,12 +81,15 @@ def get_town_square():
     channel = discord.utils.get(guild.voice_channels, name="Town Square", bitrate=64000)
     return channel
 
+
 def get_night_phase_channels():
     category = discord.utils.find(lambda m: m.name == "Night Phase", guild.categories)
     return category.channels
 
 
 currentDayAndNight = 1
+
+
 async def notify_day_count():
     global currentDayAndNight
     update_channel = discord.utils.get(guild.channels, name='game-chat')
@@ -93,6 +102,21 @@ def reset_count():
     currentDayAndNight = 1
 
 
+async def clear_game_chat():
+    update_channel = discord.utils.get(guild.channels, name='game-chat')
+    messages = await update_channel.history(limit=200).flatten()
+    await update_channel.delete_messages(messages)
+
+
+async def notify_whispers_end():
+    update_channel = discord.utils.get(guild.channels, name='general')
+    await update_channel.send(f"Whispers closing in 1 minute.")
+    await asyncio.sleep(30)
+    await update_channel.send(f"Whispers closing in 30 seconds. Please wrap up your conversations.")
+    await asyncio.sleep(30)
+    await update_channel.send(f"Whispers are now closed. Please return to {TOWN_SQUARE} for nominations.")
+
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -101,12 +125,16 @@ async def on_message(message):
     if message.channel.name == "moveeradmin":
         if "go to sleep" in message.content.lower():
             await go_to_sleep()
+        elif "wake up gently" in message.content.lower():
+            await wake_up()
         elif "wake up" in message.content.lower():
             await wake_up()
             await notify_day_count()
         elif "game over" in message.content.lower():
             reset_count()
+            await clear_game_chat()
+        elif "whispers" in message.content.lower():
+            await notify_whispers_end()
+
 
 client.run(TOKEN)
-
-
