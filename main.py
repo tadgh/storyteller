@@ -95,7 +95,7 @@ def reset_count():
 
 
 async def notify_whispers_end():
-    update_channel = discord.utils.get(guild.channels, name=TOWN_SQUARE)
+    update_channel = discord.utils.get(guild.channels, name='general')
     await update_channel.send(f"Whispers closing in 1 minute.")
     await asyncio.sleep(30)
     await update_channel.send(f"Whispers closing in 30 seconds. Please wrap up your conversations.")
