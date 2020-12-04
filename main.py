@@ -25,11 +25,13 @@ intents.members = True
 client = discord.Client(intents=intents)
 guild = None
 
+
 @client.event
 async def on_ready():
     global guild
     print(f'{client.user} has connected to Discord in guild {client.guilds}')
     guild = discord.utils.get(client.guilds, name=GUILD)
+
 
 @client.event
 async def on_member_join(member):
@@ -38,8 +40,10 @@ async def on_member_join(member):
         f"Hi {member.name}, welcome to Blood on the Clocktower! Here is the link to join the session https://bra1n.github.io/townsquare/#play/max"
     )
 
+
 async def wake_up():
     await send_all_to_town_square()
+
 
 async def send_to_random_night_channels(members):
     channels = get_night_phase_channels()
@@ -65,6 +69,7 @@ async def send_all_to_town_square():
     for member in night_members:
         await member.move_to(town_square)
 
+
 async def go_to_sleep():
     channel = get_town_square()
     voice_states = channel.voice_states
@@ -76,12 +81,15 @@ def get_town_square():
     channel = discord.utils.get(guild.voice_channels, name="Town Square", bitrate=64000)
     return channel
 
+
 def get_night_phase_channels():
     category = discord.utils.find(lambda m: m.name == "Night Phase", guild.categories)
     return category.channels
 
 
 currentDayAndNight = 1
+
+
 async def notify_day_count():
     global currentDayAndNight
     update_channel = discord.utils.get(guild.channels, name='game-chat')
@@ -92,6 +100,7 @@ async def notify_day_count():
 def reset_count():
     global currentDayAndNight
     currentDayAndNight = 1
+
 
 async def clear_game_chat():
     update_channel = discord.utils.get(guild.channels, name='game-chat')
@@ -127,6 +136,5 @@ async def on_message(message):
         elif "whispers" in message.content.lower():
             await notify_whispers_end()
 
+
 client.run(TOKEN)
-
-
