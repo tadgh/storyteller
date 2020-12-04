@@ -116,6 +116,8 @@ async def on_message(message):
     if message.channel.name == "moveeradmin":
         if "go to sleep" in message.content.lower():
             await go_to_sleep()
+        elif "wake up gently" in message.content.lower():
+            await wake_up()
         elif "wake up" in message.content.lower():
             await wake_up()
             await notify_day_count()
