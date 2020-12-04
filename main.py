@@ -6,8 +6,6 @@ import random
 from threading import Thread
 from time import sleep
 
-import discord
-
 # bot.py
 import os
 
