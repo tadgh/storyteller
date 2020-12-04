@@ -92,7 +92,7 @@ def reset_count():
     global currentDayAndNight
     currentDayAndNight = 1
 
-def clear_game_chat():
+async def clear_game_chat():
     update_channel = discord.utils.get(guild.channels, name='game-chat')
     messages = await update_channel.history(limit=200).flatten()
     await update_channel.delete_messages(messages)
@@ -111,7 +111,7 @@ async def on_message(message):
             await notify_day_count()
         elif "game over" in message.content.lower():
             reset_count()
-            clear_game_chat()
+            await clear_game_chat()
 
 client.run(TOKEN)
 
