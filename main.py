@@ -109,12 +109,12 @@ async def clear_game_chat():
 
 
 async def notify_whispers_end():
-    update_channel = discord.utils.get(guild.channels, name='general')
-    await update_channel.send(f"Whispers closing in 1 minute.")
+    channels = [discord.utils.get(guild.channels, name='general'), discord.utils.get(guild.channels, name='game-chat')]
+    for channel in channels: await channel.send(f"Whispers closing in 1 minute.")
     await asyncio.sleep(30)
-    await update_channel.send(f"Whispers closing in 30 seconds. Please wrap up your conversations.")
+    for channel in channels: await channel.send(f"Whispers closing in 30 seconds. Please wrap up your conversations.")
     await asyncio.sleep(30)
-    await update_channel.send(f"Whispers are now closed. Please return to {TOWN_SQUARE} for nominations.")
+    for channel in channels: await channel.send(f"Whispers are now closed. Please return to {TOWN_SQUARE} for nominations.")
 
 
 @client.event
@@ -133,7 +133,7 @@ async def on_message(message):
         elif "game over" in message.content.lower():
             reset_count()
             await clear_game_chat()
-        elif "whispers" in message.content.lower():
+        elif "whisper" in message.content.lower():
             await notify_whispers_end()
 
 
