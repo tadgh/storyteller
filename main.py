@@ -78,7 +78,7 @@ async def go_to_sleep():
     members = [guild.get_member(member_id) for member_id, _ in voice_states.items()]
     await send_to_random_night_channels(members)
     if clockhand:
-        moveer_channel = discord.utils.get(guild.channels, name='moveeradmin')
+        moveer_channel = discord.utils.get(guild.channels, name='game-chat')
         if currentDayAndNight == 1:
             await moveer_channel.send(f'The clockhand is on the demon')
         else:
