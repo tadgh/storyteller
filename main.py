@@ -1,13 +1,23 @@
+import asyncio
+
 from sanic import Sanic
 from sanic.response import json
-import bot
+# from bot import StoryTeller
+from bot import StoryTeller
 
-# bot_app = bot.start()
-app = Sanic()
+app = Sanic(name="zoop")
+
 
 @app.route('/')
 async def test(request):
     return json({'hello': 'world'})
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+webserver = app.create_server(host='0.0.0.0', port=8000, debug=True, return_asyncio_server=True)
+asyncio.ensure_future(webserver)
+
+loop = asyncio.get_event_loop()
+bot = StoryTeller()
+loop.create_task(bot.boot_up())
+loop.run_forever()
+
+
