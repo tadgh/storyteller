@@ -65,12 +65,12 @@ class StoryTeller(discord.Client):
         voice_states = channel.voice_states
         members = [self.guild.get_member(member_id) for member_id, _ in voice_states.items()]
         await self.send_to_random_night_channels(members)
-        if clockhand:
+        if self.clockhand:
             moveer_channel = discord.utils.get(self.guild.channels, name='game-chat')
-            if currentDayAndNight == 1:
+            if self.currentDayAndNight == 1:
                 await moveer_channel.send(f'The clockhand is on the demon')
             else:
-                await moveer_channel.send(f'The clockhand has moved {currentDayAndNight - 1} times')
+                await moveer_channel.send(f'The clockhand has moved {self.currentDayAndNight - 1} times')
 
     def get_town_square(self):
         channel = discord.utils.get(self.guild.voice_channels, name="Town Square", bitrate=64000)
@@ -81,14 +81,12 @@ class StoryTeller(discord.Client):
         return category.channels
 
     async def notify_day_count(self):
-        global currentDayAndNight
         update_channel = discord.utils.get(self.guild.channels, name='game-chat')
-        await update_channel.send(f"Last night was Night {currentDayAndNight}\nToday is Day {currentDayAndNight}")
-        currentDayAndNight += 1
+        await update_channel.send(f"Last night was Night {self.currentDayAndNight}\nToday is Day {self.currentDayAndNight}")
+        self.currentDayAndNight += 1
 
     def reset_count(self):
-        global currentDayAndNight
-        currentDayAndNight = 1
+        self.currentDayAndNight = 1
 
     async def clear_game_chat(self):
         update_channel = discord.utils.get(self.guild.channels, name='game-chat')
@@ -119,10 +117,9 @@ class StoryTeller(discord.Client):
         await moveer_channel.send(help_message)
 
     async def toggle_clockhand(self):
-        global clockhand
         moveer_channel = discord.utils.get(self.guild.channels, name='moveeradmin')
-        clockhand = not clockhand
-        await moveer_channel.send(f'The clockhand is now {"on" if clockhand else "off"}')
+        self.clockhand = not self.clockhand
+        await moveer_channel.send(f'The clockhand is now {"on" if self.clockhand else "off"}')
 
     async def on_message(self, message):
         if message.author == self.user:
