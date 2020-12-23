@@ -21,11 +21,17 @@ async def test(request):
 @app.route('/wake_up')
 async def test(request):
     await bot.wake_up()
+    await bot.notify_day_count()
     return json({'woken': 'yes'})
 
 @app.route('/wake_up_gently')
 async def test(request):
-    await bot.wake_up_gently()
+    await bot.wake_up()
+    return json({'woken': 'yes'})
+
+@app.route('/clockhand')
+async def test(request):
+    clockhand_is_enabled = await bot.toggle_clockhand()
     return json({'woken': 'yes'})
 
 webserver = app.create_server(host='0.0.0.0', port=8000, debug=True, return_asyncio_server=True)
