@@ -3,7 +3,6 @@ import os
 
 from sanic import Sanic
 from sanic.response import json, empty
-from sanic.request import RequestParameters
 from dotenv import load_dotenv
 from bot import StoryTeller
 
@@ -14,6 +13,9 @@ bot = StoryTeller()
 
 @app.middleware('request')
 async def check_key(request):
+    if "token" not in request.args.keys():
+        return empty(status=401)
+
     if request.args['token'][0] != os.getenv('SECRET_KEY'):
         return empty(status=401)
 
