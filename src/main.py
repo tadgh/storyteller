@@ -3,11 +3,13 @@ import os
 
 from sanic import Sanic
 from sanic.response import json, empty
+from sanic_cors import CORS, cross_origin
 from dotenv import load_dotenv
 from bot import StoryTeller
 
 load_dotenv()
 app = Sanic(name="zoop")
+cors = CORS(app, resources={r"/*": {"origins": "https://clocktower.online"}})
 bot = StoryTeller()
 
 
@@ -42,6 +44,7 @@ async def test(request):
 async def test(request):
     await bot.wake_up()
     return json({'woken': 'yes'})
+
 
 @app.route('/clockhand')
 async def test(request):
