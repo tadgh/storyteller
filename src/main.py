@@ -28,6 +28,23 @@ async def test(request):
     await bot.wake_up_gently()
     return json({'woken': 'yes'})
 
+@app.route('/good_wins')
+async def test(request):
+    await bot.clear_game_chat()
+    bot.reset_count()
+    return json({'victor': 'good'})
+
+@app.route('/evil_wins')
+async def test(request):
+    await bot.clear_game_chat()
+    bot.reset_count()
+    return json({'victor': 'evil'})
+
+@app.route('/whisper_warning')
+async def test(request):
+    await bot.notify_whispers_end()
+    return json({'notified': 'sure'})
+
 webserver = app.create_server(host='0.0.0.0', port=8000, debug=True, return_asyncio_server=True)
 asyncio.ensure_future(webserver)
 
