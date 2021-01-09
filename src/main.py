@@ -21,7 +21,6 @@ async def check_key(request):
     if request.args['token'][0] != os.getenv('SECRET_KEY'):
         return empty(status=401)
 
-
 @app.route('/')
 async def test(request):
     return json({'hello': 'world'})
